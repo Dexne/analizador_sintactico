@@ -52,13 +52,3 @@ Manejador::Manejador(string nombre) {
 }
 
 #endif
-
-
-
-/* 
-
-Cosas por hacer
-
-Revisar que el manejador genere bien la matriz de produccion
-
-*/
