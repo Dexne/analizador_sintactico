@@ -17,19 +17,13 @@ Manejador::Manejador(string nombre) {
     this->archivo = new fstream(this->nombre_archivo, ios::in);
     
     if (this->archivo->is_open()) {
-        for (int f = -1; f<FILAS-1; f++) {
+        for (int f = 0; f<FILAS; f++) {
         
             getline((*archivo), linea);
             stringstream fila(linea);
 
-            // exclude title column
-            if (f == -1) continue;
-
-            for (int c = -1; c<COLUMNAS; c++) {
+            for (int c = 0; c<COLUMNAS; c++) {
                 getline(fila, palabra, ',');
-
-                // exclude index column
-                if (c == -1) continue;
                 
                 if (palabra == "") reglasProduccion[f][c] = 0;
                 // d-rules production 
@@ -40,7 +34,7 @@ Manejador::Manejador(string nombre) {
                 // r-rules reduction
                 else if (palabra[0] == 'r') {
                     palabra.erase(palabra.begin());
-                    reglasReduccion[f][c] = -1 * std::stoi(palabra.c_str());
+                    reglasProduccion[f][c] = -1 * std::stoi(palabra.c_str());
                 }
                 // only number
                 else if (palabra[0] >= '0' and palabra[0] <= '9') {

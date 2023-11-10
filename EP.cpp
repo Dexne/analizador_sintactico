@@ -11,6 +11,7 @@ public:
     EP(string valor) : valor(valor) {}
     EP(string valor, Token t_token) : valor(valor), token(t_token) {}
     friend class PilaLR;
+    friend struct Regla;
 };
 
 class Terminal : public EP {

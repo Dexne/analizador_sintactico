@@ -21,9 +21,11 @@ using std::getline;
 using std::map;
 using std::ios;
 using std::regex;
+using std::endl;
 
 class EP;
 class PilaLR;
+struct Regla;
 
 // static inline int reglasProduccion[5][4] = {
 //      {2, 0, 0, 1},

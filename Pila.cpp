@@ -2,12 +2,12 @@
 #define PILA_CLASS
 
 #include "./EP.cpp"
+#include "includes.h"
+#include <cmath>
 
 class PilaLR {
-    private:
-        vector<EP> entrada;
-
     public:
+        vector<EP> entrada;
         PilaLR() {
             this->entrada.push_back(EP("$"));
             this->entrada.push_back(EP("0"));
@@ -17,6 +17,44 @@ class PilaLR {
         void expansion(string);
         void reduccion();
         string imprimir() const;
+};
+
+struct Rule {
+    string generate;
+    Token token;
+    int elements;
+};
+Rule rrules[10] = {
+    {"0", Token::T_Unkwown, 0},
+    {"0", Token::T_Unkwown, 0},
+    {"0", Token::T_Unkwown, 0},
+    {"0", Token::T_Unkwown, 0},
+    {"0", Token::T_Unkwown, 0},
+    {"0", Token::T_Unkwown, 0},
+    {"0", Token::T_Unkwown, 0},
+    {"ListVar", Token::T_ListaVar, 0},
+    {"0", Token::T_Unkwown, 0},
+    {"0", Token::T_Unkwown, 0}
+};
+struct Regla {
+    static void Simple(PilaLR* pila, int& token_eval) {
+         // insertar evaluacion de regla
+        pila->entrada.push_back(EP(string(1, ('0' + token_eval))));
+    }  
+    static void Compleja(PilaLR* pila, int& token_eval) {
+        pila->entrada.pop_back();
+
+        token_eval = std::abs(token_eval);
+        int top = (int)(pila->entrada[pila->entrada.size() - 1].valor.c_str()[0] - '0');
+
+        struct Rule resultado = rrules[token_eval];
+        int eval = reglasProduccion[top][resultado.token];
+
+        if (!resultado.elements) {
+            pila->entrada.push_back(EP(resultado.generate));
+            pila->entrada.push_back(EP(string(1, '0' + eval)));
+        }
+    }
 };
 
 Token PilaLR::getTokenType(const string& word) {
@@ -65,12 +103,23 @@ void PilaLR::expansion(string datos) {
     while (ss >> t) tokens_vector.push_back(t);
 
     // Proceso de expansión
-    for (auto token: tokens_vector) {
+    for (int i = 0; i<tokens_vector.size(); i++) {
+        string token = tokens_vector[i];
         // proceso de analizador lexico
         t_token = this->getTokenType(token);        
         int top = (int)(this->entrada[this->entrada.size() - 1].valor.c_str()[0] - '0'); // almacenar anterior
+
         this->entrada.push_back(EP(token, t_token)); // crear elemento con valor y tipo
-        this->entrada.push_back(EP(string(1, ('0' + reglasProduccion[top][t_token])))); // insertar evaluacion de regla
+        int eval = reglasProduccion[top][t_token];
+        if (eval > 0) {
+            Regla::Simple(this, eval);
+            cout << "simple\n" << endl;
+        }
+        else if (eval < 0) {
+            Regla::Compleja(this, eval);
+            cout << "compleja\n" << endl;
+            i--;
+        }
     }
     this->entrada.push_back(EP("$", T_dollar)); 
 }
@@ -116,6 +165,12 @@ $0int5hola8             ;$                              r7 ListVaR
 $0int5hola8LiatVar      ;$                              9
 $0int5hola8LiatVar9     ;$                              d12
 $0int5hola8LiatVar9;12   $                              r6 DefVar nos dice = tipo identificador <ListaVar> ; tienes 4, quita el doble
+
+
+// comportamiento de Regla Compleja
+        resultado = valor de la regla
+        eval = comparacion resultado <> top
+        push resultado, eval
 
 // comportamiento de producciones o solitarios
 // 1. comparar la entrada con el tope -> pushear la entrada y después el resultado
