@@ -38,8 +38,7 @@ Rule rrules[10] = {
 };
 struct Regla {
     static void Simple(PilaLR* pila, int& token_eval) {
-         // insertar evaluacion de regla
-        pila->entrada.push_back(EP(string(1, ('0' + token_eval))));
+        pila->entrada.push_back(EP(std::to_string(token_eval)));
     }  
     static void Compleja(PilaLR* pila, int& token_eval) {
         pila->entrada.pop_back();
@@ -52,7 +51,7 @@ struct Regla {
 
         if (!resultado.elements) {
             pila->entrada.push_back(EP(resultado.generate));
-            pila->entrada.push_back(EP(string(1, '0' + eval)));
+            pila->entrada.push_back(EP(std::to_string(eval)));
         }
     }
 };
@@ -111,13 +110,11 @@ void PilaLR::expansion(string datos) {
 
         this->entrada.push_back(EP(token, t_token)); // crear elemento con valor y tipo
         int eval = reglasProduccion[top][t_token];
-        if (eval > 0) {
+        cout << "\nEval\t" << eval << endl;
+        if (eval > 0)
             Regla::Simple(this, eval);
-            cout << "simple\n" << endl;
-        }
         else if (eval < 0) {
             Regla::Compleja(this, eval);
-            cout << "compleja\n" << endl;
             i--;
         }
     }
